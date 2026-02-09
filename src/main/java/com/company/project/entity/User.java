@@ -5,11 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 用户实体类（示例）
- * 继承BaseEntity获取公共字段
- *
- * @author Your Name
- * @date 2026-01-31
+ * 用户实体类
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -24,7 +20,7 @@ public class User extends BaseEntity {
     private String username;
 
     /**
-     * 密码
+     * 密码（BCrypt加密）
      */
     private String password;
 
@@ -42,6 +38,16 @@ public class User extends BaseEntity {
      * 邮箱
      */
     private String email;
+
+    /**
+     * 头像URL
+     */
+    private String avatar;
+
+    /**
+     * 当前进行中的会话ID（限制只能开一局）
+     */
+    private Long currentSessionId;
 
     /**
      * 状态（0-禁用，1-启用）

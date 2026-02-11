@@ -126,6 +126,14 @@ public class PomodoroServiceImpl implements PomodoroService {
         if (session != null && session.getStatus() == PomodoroSession.STATUS_IN_PROGRESS) {
             return session;
         }
+
+        // 如果会话不存在或已结束，清除用户的当前会话ID
+        if (user.getCurrentSessionId() != null) {
+            LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(User::getId, userId)
+                         .set(User::getCurrentSessionId, null);
+            userMapper.update(null, updateWrapper);
+        }
         return null;
     }
 

@@ -1,5 +1,48 @@
 # Spring Boot 后端项目
+启动 Redis 和建表说明
 
+1. 启动 Redis
+
+在 Windows 上启动 Redis，打开命令提示符（CMD）或直接双击：
+
+E:\A_claude\redis\redis-server.exe
+
+或者在 CMD 中运行：
+cd E:\A_claude\redis
+redis-server.exe
+
+启动成功后会看到 Redis 的启动日志，显示 Ready to accept connections。
+
+注意：保持这个窗口打开，关闭窗口 Redis 就会停止。
+
+  ---
+2. 数据库建表
+
+是的，需要建表！ Redis 不需要建表（它是键值存储），但 MySQL 需要执行建表语句。
+
+请在 MySQL 中执行以下步骤：
+
+1. 创建数据库（如果还没有）：
+   CREATE DATABASE figture_db DEFAULT CHARACTER SET utf8mb4;
+
+2. 执行 schema.sql：
+   在 C:\Users\ASUS\Desktop\backend\src\main\resources\schema.sql 中有完整的建表语句。
+
+用 MySQL 客户端（如 Navicat、MySQL Workbench 或命令行）连接数据库后，执行该文件中的 SQL：
+
+USE figture_db;
+
+-- 然后执行 schema.sql 的全部内容
+-- 包括6张表：sys_user, theme, user_settings, pomodoro_session, work_log, daily_stats
+
+  ---
+启动顺序
+
+1. 先启动 MySQL（确保运行中）
+2. 执行 schema.sql 建表
+3. 启动 Redis（双击 redis-server.exe）
+4. 启动 Spring Boot 后端（运行 BackendApplication）
+5. 启动 前端（HBuilderX 运行项目）
 ## 项目说明
 这是一个基于 Spring Boot 3.2 + MyBatis Plus 的标准后端项目框架，严格遵循阿里巴巴Java开发规范。
 
@@ -59,7 +102,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/your_database
     username: root
-    password: your_password
+    password: 
 ```
 
 ### 2. 初始化数据库
@@ -129,5 +172,77 @@ return Result.fail("错误信息");         // 失败
 5. 接口保持规范整齐，统一返回 `Result`
 
 ---
-**作者**: Your Name
+**作者**: 陈宣而
 **日期**: 2026-01-31
+
+  ---
+🔑 核心功能实现
+┌──────────────┬───────────────────────────────────┐
+│     功能     │             实现方式              │
+├──────────────┼───────────────────────────────────┤
+│ 密码加密     │ Hutool BCrypt                     │
+├──────────────┼───────────────────────────────────┤
+│ JWT认证      │ JJWT 0.12.3 + 拦截器              │
+├──────────────┼───────────────────────────────────┤
+│ 限制一局     │ Redis锁 + current_session_id 字段 │
+├──────────────┼───────────────────────────────────┤
+│ 欢迎语       │ 查询昨日 daily_stats + 计算排名   │
+├──────────────┼───────────────────────────────────┤
+│ 工作过久提醒 │ 对比今日时长与用户设置阈值        │
+└──────────────┴───────────────────────────────────┘
+  ---
+📁 新增文件清单
+
+src/main/java/com/company/project/
+├── controller/
+│   ├── AuthController.java          # 新增
+│   ├── PomodoroController.java      # 新增
+│   ├── SettingsController.java      # 新增
+│   └── StatsController.java         # 新增
+├── dto/
+│   ├── LoginRequest.java            # 新增
+│   ├── LoginResponse.java           # 新增
+│   ├── RegisterRequest.java         # 新增
+│   ├── SettingsUpdateRequest.java   # 新增
+│   ├── StatsDTO.java                # 新增
+│   └── WelcomeDTO.java              # 新增
+├── entity/
+│   ├── User.java                    # 修改（加字段）
+│   ├── Theme.java                   # 新增
+│   ├── UserSettings.java            # 新增
+│   ├── PomodoroSession.java         # 新增
+│   ├── WorkLog.java                 # 新增
+│   └── DailyStats.java              # 新增
+├── mapper/
+│   ├── ThemeMapper.java             # 新增
+│   ├── UserSettingsMapper.java      # 新增
+│   ├── PomodoroSessionMapper.java   # 新增
+│   ├── WorkLogMapper.java           # 新增
+│   └── DailyStatsMapper.java        # 新增
+├── service/
+│   ├── AuthService.java             # 新增
+│   ├── PomodoroService.java         # 新增
+│   ├── UserSettingsService.java     # 新增
+│   ├── StatsService.java            # 新增
+│   └── impl/                        # 全部新增
+├── interceptor/
+│   └── JwtInterceptor.java          # 新增
+├── config/
+│   └── WebConfig.java               # 新增
+└── util/
+├── JwtUtil.java                 # 新增
+└── TimeFormatUtil.java          # 新增
+
+src/main/resources/
+├── sql/schema.sql                   # 重写（完整6张表）
+└── application.yml                  # 添加JWT配置
+
+  ---
+🚀 启动步骤
+
+1. 初始化数据库：执行 src/main/resources/sql/schema.sql
+2. 启动 Redis：确保本地 Redis 运行在 6379 端口
+3. 启动项目：mvn spring-boot:run
+4. 访问API文档：http://localhost:8080/api/doc.html
+
+测试账号：admin / 123456

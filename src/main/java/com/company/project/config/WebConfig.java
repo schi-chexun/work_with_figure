@@ -17,12 +17,13 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // 注意：context-path 是 /api，所以这里的路径不需要再加 /api 前缀
         registry.addInterceptor(jwtInterceptor)
-                .addPathPatterns("/api/**")
+                .addPathPatterns("/**")
                 .excludePathPatterns(
-                        "/api/auth/login",
-                        "/api/auth/register",
-                        "/api/settings/themes",  // 主题列表公开访问
+                        "/auth/login",
+                        "/auth/register",
+                        "/settings/themes",  // 主题列表公开访问
                         "/doc.html",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",

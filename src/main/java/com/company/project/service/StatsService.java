@@ -36,4 +36,13 @@ public interface StatsService {
      */
     Double calculateBeatPercentage(Long userId, LocalDate date);
 
+    /**
+     * 上报键盘敲击数据 (高频聚合)
+     */
+    void reportKeyboardActivity(Long userId, com.company.project.dto.KeyboardReportDTO report);
+
+    /**
+     * 获取今日键盘敲击排行榜 (前10名)
+     */
+    List<com.company.project.dto.RankItemDTO> getDailyKeyboardRank();
 }

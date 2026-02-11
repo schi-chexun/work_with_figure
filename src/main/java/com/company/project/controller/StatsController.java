@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.company.project.dto.KeyboardReportDTO;
+import com.company.project.dto.RankItemDTO;
+
 /**
  * 统计控制器
  */
@@ -23,6 +26,19 @@ import java.util.List;
 public class StatsController {
 
     private final StatsService statsService;
+
+    @Operation(summary = "上报键盘活动数据", description = "前端定时上报敲击次数和收获")
+    @PostMapping("/keyboard/report")
+    public Result<Void> reportKeyboard(@RequestAttribute("userId") Long userId, @RequestBody KeyboardReportDTO report) {
+        statsService.reportKeyboardActivity(userId, report);
+        return Result.success();
+    }
+
+    @Operation(summary = "获取今日键盘排行榜", description = "基于Redis的实时排行榜")
+    @GetMapping("/keyboard/rank")
+    public Result<List<RankItemDTO>> getKeyboardRank() {
+        return Result.success(statsService.getDailyKeyboardRank());
+    }
 
     @Operation(summary = "获取统计概览", description = "包含今日、本周、本月、总计数据")
     @GetMapping("/overview")

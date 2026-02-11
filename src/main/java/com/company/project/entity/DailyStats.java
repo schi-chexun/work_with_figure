@@ -49,6 +49,21 @@ public class DailyStats implements Serializable {
      */
     private Integer completedPomodoros;
 
+    /**
+     * 每日键盘敲击总数
+     */
+    private Integer totalTaps;
+
+    /**
+     * 每日农场收获总数
+     */
+    private Integer totalHarvests;
+
+    /**
+     * 每日最热键 (如 SPACE, ENTER)
+     */
+    private String mostActiveKey;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime createTime;
 
